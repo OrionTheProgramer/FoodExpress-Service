@@ -31,7 +31,7 @@ public class DataLoader implements CommandLineRunner {
         repo.deleteAll();
 
         // Crea productos de prueba
-        for (int i = 0; i <= 20; i++) {
+        for (int i = 0; i <= 70; i++) {
 
             String comentario = faker.lorem().sentence(10);
             Long clienteId = faker.number().numberBetween(1L, 20L);

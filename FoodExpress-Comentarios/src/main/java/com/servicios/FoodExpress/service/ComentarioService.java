@@ -180,8 +180,8 @@ public class ComentarioService {
         JsonNode node;
         try {
             node = new ObjectMapper().readTree(datos);
-            String datos_procesados = ((ObjectNode) node).get(WhatIWant).asText();
-            return datos_procesados;
+            datos = ((ObjectNode) node).get(WhatIWant).asText();
+            return datos;
 
         } catch (Exception e) {
             throw new RuntimeException("Error al obtener la información del Json", e);
