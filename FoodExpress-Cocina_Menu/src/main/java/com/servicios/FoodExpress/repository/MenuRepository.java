@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-    public Optional<Menu> findByGeneration_date(LocalDate date);
+    public Optional<Menu> findByGenerationDate(LocalDate date);
 }

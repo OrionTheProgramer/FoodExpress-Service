@@ -9,7 +9,7 @@ public enum ProductoCategory {
     ENSALADA,
     SANDWICH,
     DESAYUNO,
-    PLAT0_PRINCIPAL,
+    PLATO_PRINCIPAL,
     SNACK,
     VEGETARIANO,
     VEGANO,

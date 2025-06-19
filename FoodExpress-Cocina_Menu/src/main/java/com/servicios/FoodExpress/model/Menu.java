@@ -18,8 +18,9 @@ public class Menu {
     private Long id;
 
     @Column(name = "generation_date", updatable = false, unique = true)
-    private LocalDate generation_date;
+    private LocalDate generationDate;
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "menu_id")   // aquí le decimos “la FK menu_id vive en la tabla Platos”
     private List<Plato> dishes;
 }

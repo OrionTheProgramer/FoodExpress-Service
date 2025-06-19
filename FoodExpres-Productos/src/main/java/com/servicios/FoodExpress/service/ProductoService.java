@@ -88,7 +88,7 @@ public class ProductoService {
                 exis.setStock(Datos.getStock());
                 exis.setCategoria(Datos.getCategoria());
 
-                return repo.save(Datos);
+                return repo.save(exis);
             } else {
                 return null; // Producto no encontrado
             }

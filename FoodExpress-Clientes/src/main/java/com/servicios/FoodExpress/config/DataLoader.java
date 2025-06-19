@@ -41,11 +41,14 @@ public class DataLoader implements CommandLineRunner {
             cliente.setApellido(faker.name().lastName());
             cliente.setEmail(faker.internet().emailAddress());
 
-            // Genera un número de teléfono aleatorio (pediente)
+            // Genera un número de teléfono aleatorio
+            String PhoneNumber = String.format("+569%08d",
+                    faker.number().numberBetween(10_000_000L, 100_000_000L));
+            cliente.setTelefono(PhoneNumber);
 
 
 
-            // Aleatoriamente elige una categoría segun ClienteCategory
+            // Aleatoriamente, elige una categoría según ClienteCategory
             List<ClienteCategory> categorias = List.of(ClienteCategory.values());
             cliente.setCategoria(categorias.get(faker.number().numberBetween(0, categorias.size())));
             cliente.setDireccion(faker.address().fullAddress());

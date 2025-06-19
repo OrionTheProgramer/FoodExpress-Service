@@ -9,6 +9,6 @@ import java.util.List;
 public interface PlatoRepository extends JpaRepository<Plato, Long> {
 
     public List<Plato> findByCategory(ProductoCategory category);
-    public Plato findByProductoid(Long productoid);
-    public Boolean existsByProductoid(Long productoid);
+    public Plato findByProductoId(Long productoId);
+    public Boolean existsByProductoId(Long productoId);
 }

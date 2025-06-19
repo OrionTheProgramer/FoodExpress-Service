@@ -38,8 +38,13 @@ public class KitchenController {
 
     @Operation(summary = "Buscar un menu por su fecha de generacion")
     @GetMapping("/listar/menus/{date}")
-    public Menu MenuPorDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return service.BuscarMenuPorFecha(date);
+    public ResponseEntity<Menu> MenuPorDate(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Menu menu = service.BuscarMenuPorFecha(date);
+        if (menu != null) {
+            return ResponseEntity.ok(menu);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Operation(summary = "Buscar un plato por su ID")
@@ -51,8 +56,8 @@ public class KitchenController {
     // Sección de Metodos POST
 
     @Operation(summary = "Generar un menu con los platos del dia")
-    @PostMapping("/generar/menu")
-    public ResponseEntity<Menu> GenerarMenu(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    @PostMapping("/generar/menu/{date}")
+    public ResponseEntity<Menu> GenerarMenu(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                             @RequestParam Map<ProductoCategory, Integer> pedidos){
         Menu m = service.GenerarMenu(date, pedidos);
 

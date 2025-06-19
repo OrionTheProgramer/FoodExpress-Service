@@ -8,8 +8,10 @@ import com.servicios.FoodExpress.model.Plato;
 import com.servicios.FoodExpress.model.PlatoEnriched;
 import com.servicios.FoodExpress.repository.MenuRepository;
 import com.servicios.FoodExpress.repository.PlatoRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class KitchenService {
-    // Inicializando los repositorios y los WebClient necesarios
+    // Repositorios y WebClients
     private final PlatoRepository repo_plato;
     private final MenuRepository repo_menu;
     private final WebClient ProductoWeb = WebClient.builder().baseUrl("http://localhost:8001").build();
@@ -29,186 +31,158 @@ public class KitchenService {
         this.repo_menu = repo_menu;
     }
 
-    private record InfoPlato(Long id, String nombre, String description,BigInteger precio) {}
+    private record InfoPlato(Long id, String nombre, String description, BigInteger precio) {}
 
-    /**
-     * Devolverá el promedio de rating de un producto para darcelo a un plato.
-     * @param productoid El ID del producto del cual se quiere obtener el promedio de rating.
-     * @return El promedio de rating del producto, o 0.0f si no hay comentarios.
-     */
     private float getAverageRating(Long productoid) {
-        int suma = 0;
-        int count = 0;
-
-        // LLenamos una lista con todos los comentarios que tenga el producto
-        String Datos = ComentarioWeb.get()
+        String datos = ComentarioWeb.get()
                 .uri("/api/comentarios/buscar/por-producto/{productoid}", productoid)
-                .retrieve()
-                .bodyToMono(String.class)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().is5xxServerError() ||
+                            response.statusCode().is4xxClientError()) {
+                        // Si da error 4xx o 5xx, devolvemos un array vacío:
+                        return Mono.just("[]");
+                    }
+                    // En casos 2xx devolvemos el body normalmente
+                    return response.bodyToMono(String.class);
+                })
                 .block();
 
-        if (Datos == null || Datos.isEmpty()) {
-            return 0.0f; // Si no hay comentarios, retornamos 0
+        if (datos == null || datos.isEmpty()) {
+            return 0.0f;
         }
 
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode Nodo = mapper.readTree(Datos);
-
-            if (Nodo.isArray()){
-                for (JsonNode comentario : Nodo){
-                    if (comentario.has("rating")){
-                        suma += comentario.get("rating").asInt();
-                        count += 1;
+            JsonNode nodo = new ObjectMapper().readTree(datos);
+            int suma = 0, count = 0;
+            if (nodo.isArray()) {
+                for (JsonNode c : nodo) {
+                    if (c.has("rating")) {
+                        suma += c.get("rating").asInt();
+                        count++;
                     }
                 }
             }
-            float promedio = (float) suma / count;
-            return promedio;
-
+            return count == 0 ? 0.0f : (float) suma / count;
         } catch (Exception e) {
             return 0.0f;
         }
     }
 
-    /**
-     * Enriquece un plato con información adicional del producto y el promedio de rating.
-     * @param plato El plato que se quiere enriquecer con información adicional.
-     * @return Un Plato que contiene el plato enriquecido con información del producto y el promedio de rating.
-     */
-    private PlatoEnriched Enrichment(Plato plato){
+    private PlatoEnriched Enrichment(Plato plato) {
+        InfoPlato info = ProductoWeb.get()
+                .uri("/api/productos/buscar/{id}", plato.getProductoId())
+                .retrieve()
+                .bodyToMono(InfoPlato.class)
+                .block();
 
-        InfoPlato info = ProductoWeb.get().uri("/api/productos/buscar/{id}", plato.getProductoId()).retrieve()
-                .bodyToMono(InfoPlato.class).block();
-
-        return PlatoEnriched.builder().id(plato.getId()).productoid(plato.getProductoId()).category(plato.getCategory())
-                .nombre(info.nombre()).description(info.description()).precio(info.precio()).rating(getAverageRating(plato.getProductoId()))
+        return PlatoEnriched.builder()
+                .id(plato.getId())
+                .productoid(plato.getProductoId())
+                .category(plato.getCategory())
+                .nombre(info.nombre())
+                .description(info.description())
+                .precio(info.precio())
+                .rating(getAverageRating(plato.getProductoId()))
                 .build();
     }
 
-    public Menu GenerarMenu(LocalDate date,Map<ProductoCategory, Integer> categoria_cantidad){
+    public Menu GenerarMenu(LocalDate date, Map<ProductoCategory, Integer> categoria_cantidad) {
         Menu menu = new Menu();
+        menu.setGenerationDate(date);
 
-        menu.setGeneration_date(date);
+        List<Plato> allSelected = new ArrayList<>();
         for (var entry : categoria_cantidad.entrySet()) {
-            ProductoCategory category = entry.getKey();
-            int cantidad = entry.getValue();
+            ProductoCategory cat = entry.getKey();
+            int qty = entry.getValue();
 
-            // Obtenemos los platos de la categoría especificada
-            List<Plato> platos = repo_plato.findByCategory(category);
-
-            // Si no hay suficientes platos, lanzamos una excepción
-            if (platos.size() < cantidad) {
-                throw new IllegalArgumentException("No hay suficientes platos en la categoría: " + category);
+            List<Plato> disponibles = repo_plato.findByCategory(cat);
+            if (disponibles.size() < qty) {
+                throw new IllegalArgumentException("No hay suficientes platos en la categoría: " + cat);
             }
 
-            Collections.shuffle(platos);
-            List<Plato> select = platos.subList(0, cantidad);
-
-            menu.setDishes(select);
-            repo_menu.save(menu);
+            Collections.shuffle(disponibles);
+            List<Plato> slice = disponibles.subList(0, qty);
+            allSelected.addAll(slice);
         }
 
-        return menu;
+        menu.setDishes(allSelected);
+        return repo_menu.save(menu);
     }
 
-    /**
-     * Genera una lista de platos enriquecidos a partir de los productos disponibles.
-     * Este metodo realiza las siguientes acciones:
-     * 1. Obtiene todos los productos disponibles desde un microservicio.
-     * 2. Verifica si cada producto ya tiene un plato asociado en la base de datos.
-     * 3. Si no existe un plato para un producto, lo crea y lo guarda en el repositorio.
-     * 4. Enriquece cada plato con información adicional del producto y el promedio de rating.
-     *
-     * @return Una lista de objetos `PlatoEnriched` que representan los platos enriquecidos.
-     * @throws IllegalArgumentException Si no hay productos disponibles para generar platos.
-     * @throws RuntimeException Si ocurre un error al procesar los datos del microservicio.
-     */
-    public List<PlatoEnriched> GenerarPlatos(){
-        // Obtenemos todos los productos, y a partir de cada uno generamos un plato.
-        // Luego enriquecemos cada plato con información adicional del producto y el promedio de rating.
-        // También verificamos si ese producto ya tiene un plato asociado, si no lo tiene, lo creamos
-        JsonNode Nodo;
-        List<PlatoEnriched> platosEnriquecidos = new ArrayList<>();
-        String ContadorBruto = ProductoWeb.get().uri("/api/productos/listar").retrieve().bodyToMono(String.class)
+    public List<PlatoEnriched> GenerarPlatos() {
+        String bruto = ProductoWeb.get()
+                .uri("/api/productos/listar")
+                .retrieve()
+                .bodyToMono(String.class)
                 .block();
 
-        if (ContadorBruto == null || ContadorBruto.isEmpty()) {
+        if (bruto == null || bruto.isEmpty()) {
             throw new IllegalArgumentException("No hay productos disponibles para generar platos.");
         }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            Nodo = mapper.readTree(ContadorBruto);
 
-            if (Nodo.isArray()){
-                for (JsonNode producto: Nodo){
-                    if (producto.has("id")){
-                        Long productoid = producto.get("id").asLong();
-                        // Verificamos si ya existe un plato para este producto
-                        if (!repo_plato.existsByProductoid(productoid)) {
-                            // Si no existe, creamos un nuevo plato
-                            Plato plato = Plato.builder()
-                                    .productoId(productoid)
-                                    .category(ProductoCategory.valueOf(producto.get("category").asText()))
+        try {
+            JsonNode arr = new ObjectMapper().readTree(bruto);
+            if (arr.isArray()) {
+                for (JsonNode p : arr) {
+                    if (p.has("id") && p.has("categoria")) {
+                        Long pid = p.get("id").asLong();
+                        // sólo crea si no existe
+                        if (!repo_plato.existsByProductoId(pid)) {
+                            ProductoCategory cat =
+                                    ProductoCategory.valueOf(p.get("categoria").asText().toUpperCase());
+
+                            Plato nuevo = Plato.builder()
+                                    .productoId(pid)
+                                    .category(cat)
                                     .build();
-                            repo_plato.save(plato);
+
+                            repo_plato.save(nuevo);
                         }
                     }
                 }
             }
-
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error procesando productos JSON", e);
         }
 
-        List<Plato> platos = repo_plato.findAll();
-        platosEnriquecidos = platos.stream().map(this::Enrichment).toList();
-
-        return platosEnriquecidos;
+        // ahora enriquecemos todos
+        return repo_plato.findAll()
+                .stream()
+                .map(this::Enrichment)
+                .collect(Collectors.toList());
     }
 
     public List<PlatoEnriched> ListarPlatos() {
-        // Listamos todos los platos enriquecidos
-        List<Plato> platos = repo_plato.findAll();
-        return platos.stream().map(this::Enrichment).collect(Collectors.toList());
+        return repo_plato.findAll()
+                .stream()
+                .map(this::Enrichment)
+                .collect(Collectors.toList());
     }
 
     public PlatoEnriched BuscarPlatoPorId(Long id) {
-        // Buscamos un plato por su ID y lo enriquecemos
-        Plato plato = repo_plato.findById(id).orElse(null);
-        if (plato == null) {
-            throw new IllegalArgumentException("Plato no encontrado con ID: " + id);
-        }
-        return Enrichment(plato);
+        Plato p = repo_plato.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Plato no encontrado con ID: " + id));
+        return Enrichment(p);
     }
 
     public List<Menu> ListarMenus() {
-        // Listamos todos los menús generados
         return repo_menu.findAll();
     }
 
     public Menu BuscarMenuPorFecha(LocalDate fecha) {
-        // Buscamos un menú por su fecha de generación
-        return repo_menu.findByGeneration_date(fecha)
+        return repo_menu.findByGenerationDate(fecha)
                 .orElseThrow(() -> new IllegalArgumentException("Menú no encontrado para la fecha: " + fecha));
     }
 
     public void EliminarPlato(Long id) {
-        // Eliminamos un plato por su ID
-        Plato plato = repo_plato.findById(id).orElse(null);
-        if (plato == null) {
-            throw new IllegalArgumentException("Plato no encontrado con ID: " + id);
-        }
-        repo_plato.delete(plato);
+        Plato p = repo_plato.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Plato no encontrado con ID: " + id));
+        repo_plato.delete(p);
     }
 
     public void EliminarMenu(LocalDate date) {
-        // Eliminamos un menú por su ID
-        Menu menu = repo_menu.findByGeneration_date(date).orElse(null);
-        if (menu == null) {
-            throw new IllegalArgumentException("Menú no encontrado con ID: " + date);
-        }
-        repo_menu.delete(menu);
+        Menu m = repo_menu.findByGenerationDate(date)
+                .orElseThrow(() -> new IllegalArgumentException("Menú no encontrado con fecha: " + date));
+        repo_menu.delete(m);
     }
-
 }
