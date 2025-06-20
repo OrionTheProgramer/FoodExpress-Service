@@ -57,8 +57,8 @@ public class KitchenController {
 
     @Operation(summary = "Generar un menu con los platos del dia")
     @PostMapping("/generar/menu/{date}")
-    public ResponseEntity<Menu> GenerarMenu(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                            @RequestParam Map<ProductoCategory, Integer> pedidos){
+    public ResponseEntity<Menu> GenerarMenu(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                            @RequestBody Map<String, Integer> pedidos){
         Menu m = service.GenerarMenu(date, pedidos);
 
         return ResponseEntity.status(201).body(m);

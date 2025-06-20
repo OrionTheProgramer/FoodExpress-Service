@@ -1,5 +1,6 @@
 package com.servicios.FoodExpress.service;
 
+import com.servicios.FoodExpress.Category.ProductoCategory;
 import com.servicios.FoodExpress.model.Producto;
 import com.servicios.FoodExpress.repository.ProductoRepository;
 /*import org.springframework.beans.factory.annotation.Autowired; cuando tenga mas de un contructor se debe utilizar*/
@@ -47,7 +48,7 @@ public class ProductoService {
      * @return Una lista de objetos Producto que pertenecen a la categoría especificada.
      */
     public List<Producto> BuscarProductoPorCategoria(String categoria) {
-        return repo.findByCategoria(categoria);
+        return repo.findByCategoria(ProductoCategory.valueOf(categoria));
     }
 
     /**

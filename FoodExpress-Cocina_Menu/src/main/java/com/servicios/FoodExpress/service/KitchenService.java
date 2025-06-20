@@ -86,13 +86,13 @@ public class KitchenService {
                 .build();
     }
 
-    public Menu GenerarMenu(LocalDate date, Map<ProductoCategory, Integer> categoria_cantidad) {
+    public Menu GenerarMenu(LocalDate date, Map<String, Integer> categoria_cantidad) {
         Menu menu = new Menu();
         menu.setGenerationDate(date);
 
         List<Plato> allSelected = new ArrayList<>();
         for (var entry : categoria_cantidad.entrySet()) {
-            ProductoCategory cat = entry.getKey();
+            ProductoCategory cat = ProductoCategory.valueOf(entry.getKey());
             int qty = entry.getValue();
 
             List<Plato> disponibles = repo_plato.findByCategory(cat);
