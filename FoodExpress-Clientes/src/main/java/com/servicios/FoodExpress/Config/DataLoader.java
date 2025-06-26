@@ -1,4 +1,4 @@
-package com.servicios.FoodExpress.config;
+package com.servicios.FoodExpress.Config;
 
 import com.servicios.FoodExpress.Category.ClienteCategory;
 import com.servicios.FoodExpress.model.Cliente;

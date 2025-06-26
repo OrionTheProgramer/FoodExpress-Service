@@ -1,4 +1,4 @@
-package com.servicios.FoodExpress.config;
+package com.servicios.FoodExpress.Config;
 
 import com.servicios.FoodExpress.model.Comentario;
 import com.servicios.FoodExpress.repository.ComentarioRepository;
