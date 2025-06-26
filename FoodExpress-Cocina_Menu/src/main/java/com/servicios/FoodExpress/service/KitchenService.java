@@ -23,8 +23,8 @@ public class KitchenService {
     // Repositorios y WebClients
     private final PlatoRepository repo_plato;
     private final MenuRepository repo_menu;
-    private final WebClient ProductoWeb = WebClient.builder().baseUrl("http://localhost:8001").build();
-    private final WebClient ComentarioWeb = WebClient.builder().baseUrl("http://localhost:8004").build();
+    private final WebClient ProductoWeb = WebClient.builder().baseUrl("http://3.216.175.113:8001").build();
+    private final WebClient ComentarioWeb = WebClient.builder().baseUrl("http://3.216.175.113:8004").build();
 
     public KitchenService(PlatoRepository repo_plato, MenuRepository repo_menu) {
         this.repo_plato = repo_plato;
