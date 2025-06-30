@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 
  * @author Leandro
  */
-@RestController @Validated @RequestMapping("/api/productos") @CrossOrigin(origins = "http://127.0.0.1:5500")
+@RestController @Validated @RequestMapping("/api/productos")
 @Tag(name = "Producto Controller", description = "Hace las operaciones CRUD sobre los productos")
 public class ProductoController {
 

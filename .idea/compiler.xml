@@ -7,21 +7,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="FoodExpress (4)" />
-        <module name="FoodExpress (3)" />
-        <module name="FoodExpress (2)" />
-        <module name="FoodExpress (1)" />
-        <module name="FoodExpress" />
+        <module name="Pedidos" />
+        <module name="Comentarios" />
+        <module name="Productos" />
+        <module name="Cocina_Menu" />
+        <module name="Clientes" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="FoodExpress" options="-parameters" />
-      <module name="FoodExpress (1)" options="-parameters" />
-      <module name="FoodExpress (2)" options="-parameters" />
-      <module name="FoodExpress (3)" options="-parameters" />
-      <module name="FoodExpress (4)" options="-parameters" />
+      <module name="Clientes" options="-parameters" />
+      <module name="Cocina_Menu" options="-parameters" />
+      <module name="Comentarios" options="-parameters" />
+      <module name="Pedidos" options="-parameters" />
+      <module name="Productos" options="-parameters" />
     </option>
   </component>
 </project>
