@@ -1,31 +1,50 @@
 version: '3.8'
 services:
   productos:
-    build: ./FoodExpres-Productos
+    build:
+      context: ./FoodExpress-Productos
+      args:
+        SERVICE_PORT: 8001
     ports:
       - "8001:8001"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+
   clientes:
-    build: ./FoodExpress-Clientes
+    build:
+      context: ./FoodExpress-Clientes
+      args:
+        SERVICE_PORT: 8002
     ports:
       - "8002:8002"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+
   cocina_menu:
-    build: ./FoodExpress-Cocina_Menu
+    build:
+      context: ./FoodExpress-Cocina_Menu
+      args:
+        SERVICE_PORT: 8003
     ports:
       - "8003:8003"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+
   comentarios:
-    build: ./FoodExpress-Comentarios
+    build:
+      context: ./FoodExpress-Comentarios
+      args:
+        SERVICE_PORT: 8004
     ports:
       - "8004:8004"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+
   pedidos:
-    build: ./FoodExpress-Pedidos
+    build:
+      context: ./FoodExpress-Pedidos
+      args:
+        SERVICE_PORT: 8005
     ports:
       - "8005:8005"
     environment:
