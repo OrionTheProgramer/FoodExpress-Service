@@ -1,27 +1,27 @@
-# Stage 1: build
+# 1) Stage de build con cache de dependencias
 FROM maven:3.9.7-eclipse-temurin-17 AS build
 
 WORKDIR /app
 
-# 1)
-COPY pom.xml .
-RUN mvn -B dependency:go-offline
+# 1.1 Copiamos sólo POMs y wrapper para descargar dependencias
+COPY pom.xml mvnw ./
+COPY .mvn .mvn
 
-# 2) 
+# Descarga TODAS las dependencias sin compilar a
+RUN chmod +x mvnw \
+ && ./mvnw dependency:go-offline -B
+
+# 1.2 Copiamos el resto del código
 COPY src ./src
-RUN mvn -B package -DskipTests
 
-# Stage 2: runtime
+# Ahora sí empaquetamos
+RUN ./mvnw -q package -DskipTests
+
+# 2) Stage runtime
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Exponemos el puerto que corresponda a este micro-servicio
-ARG SERVICE_PORT=8005
-EXPOSE ${SERVICE_PORT}
-
-# Perfil Spring
-ENV SPRING_PROFILES_ACTIVE=prod
-
+EXPOSE 8005
 ENTRYPOINT ["java","-jar","app.jar"]
