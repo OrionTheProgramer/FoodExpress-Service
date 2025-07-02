@@ -18,8 +18,8 @@ public class ComentarioService {
 
     // Inicializando el repositorio y los WebClient necesarios
     private final ComentarioRepository repo;
-    private final WebClient clienteWebClient = WebClient.builder().baseUrl("http://3.216.175.113:8002").build();
-    private final WebClient productoWebClient = WebClient.builder().baseUrl("http://3.216.175.113:8001").build();
+    private final WebClient clienteWebClient = WebClient.builder().baseUrl("http://localhost:8002").build();
+    private final WebClient productoWebClient = WebClient.builder().baseUrl("http://localhost:8001").build();
 
     public ComentarioService(ComentarioRepository repo) {
         this.repo = repo;

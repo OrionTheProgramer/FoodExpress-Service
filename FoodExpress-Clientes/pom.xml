@@ -13,7 +13,7 @@
   </parent>
 
   <groupId>com.servicios</groupId>
-  <artifactId>FoodExpress</artifactId>
+  <artifactId>Clientes</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>FoodExpress</name>
   <description>Microservicio-clientes</description>

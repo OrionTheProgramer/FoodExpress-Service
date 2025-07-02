@@ -21,8 +21,8 @@ import java.util.List;
 public class OrderService implements OrderServiceInterface{
 
     private final OrdenRepository repo;
-    private final WebClient KitchenClient = WebClient.builder().baseUrl("http://3.216.175.113:8003/api/kitchen").build();
-    private final WebClient ClienteClient = WebClient.builder().baseUrl("http://3.216.175.113:8002/api/clientes").build();
+    private final WebClient KitchenClient = WebClient.builder().baseUrl("http://localhost:8003/api/kitchen").build();
+    private final WebClient ClienteClient = WebClient.builder().baseUrl("http://localhost:8002/api/clientes").build();
 
     @Override @Transactional
     public OrdenResponse CrearOrden(OrdenRequest req){

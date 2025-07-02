@@ -5,8 +5,8 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/FoodExpress-Pedidos/pom.xml" />
-        <option value="$PROJECT_DIR$/FoodExpres-Productos/pom.xml" />
         <option value="$PROJECT_DIR$/FoodExpress-Clientes/pom.xml" />
+        <option value="$PROJECT_DIR$/FoodExpress-Productos/pom.xml" />
         <option value="$PROJECT_DIR$/FoodExpress-Cocina_Menu/pom.xml" />
         <option value="$PROJECT_DIR$/FoodExpress-Comentarios/pom.xml" />
       </list>
