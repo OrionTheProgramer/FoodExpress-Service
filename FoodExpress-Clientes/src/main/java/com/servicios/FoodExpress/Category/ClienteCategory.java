@@ -6,5 +6,6 @@ public enum ClienteCategory {
     Comprador_Organizacion,
     Comprador_Institucion,
     Comprador_Casual,
+    Comprador_VIP,
     Comprador_Leal;
 }

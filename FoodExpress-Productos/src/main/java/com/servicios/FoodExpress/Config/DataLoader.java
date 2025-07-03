@@ -1,8 +1,8 @@
 package com.servicios.FoodExpress.Config;
 
 import com.servicios.FoodExpress.Category.ProductoCategory;
-import com.servicios.FoodExpress.model.Producto;
-import com.servicios.FoodExpress.repository.ProductoRepository;
+import com.servicios.FoodExpress.Model.Producto;
+import com.servicios.FoodExpress.Repository.ProductoRepository;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

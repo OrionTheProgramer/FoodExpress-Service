@@ -1,7 +1,7 @@
 package com.servicios.FoodExpress.service;
 
-import com.servicios.FoodExpress.model.Cliente;
-import com.servicios.FoodExpress.repository.ClienteRepository;
+import com.servicios.FoodExpress.Model.Cliente;
+import com.servicios.FoodExpress.Repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class ClienteService {
      * @return El cliente encontrado
      */
     public Cliente ObtenerPorId(Long id){
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + id));
+        return repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con id: " + id));
     }
 
     /**
@@ -64,14 +64,21 @@ public class ClienteService {
      * @return El cliente actualizado
      */
     public Cliente ActualizarDatos(Cliente Datos, Long id) {
-        Cliente cliente = ObtenerPorId(id);
-        cliente.setNombre(Datos.getNombre());
-        cliente.setApellido(Datos.getApellido());
-        cliente.setEmail(Datos.getEmail());
-        cliente.setTelefono(Datos.getTelefono());
-        cliente.setDireccion(Datos.getDireccion());
-        cliente.setCategoria(Datos.getCategoria());
-        return repo.save(cliente);
+        if (Datos == null || id == null) {
+            throw new IllegalArgumentException("Datos del cliente o ID no pueden ser nulos");
+        } else if (!repo.existsById(id)) {
+            throw new IllegalArgumentException("Cliente no encontrado con id: " + id);
+
+        }else{
+            Cliente cliente = ObtenerPorId(id);
+            cliente.setNombre(Datos.getNombre());
+            cliente.setApellido(Datos.getApellido());
+            cliente.setEmail(Datos.getEmail());
+            cliente.setTelefono(Datos.getTelefono());
+            cliente.setDireccion(Datos.getDireccion());
+            cliente.setCategoria(Datos.getCategoria());
+            return repo.save(cliente);
+        }
     }
 
     /**
@@ -80,7 +87,7 @@ public class ClienteService {
      * @param id Id del cliente a eliminar
      */
     public void EliminarCliente(Long id) {
-        Cliente cliente = ObtenerPorId(id);
+        Cliente cliente = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con id: " + id));
         repo.delete(cliente);
     }
 }

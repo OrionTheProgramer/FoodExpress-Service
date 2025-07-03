@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.servicios.FoodExpress.DTOs.ComentarioInput;
 import com.servicios.FoodExpress.DTOs.ComentarioOutput;
-import com.servicios.FoodExpress.model.Comentario;
-import com.servicios.FoodExpress.repository.ComentarioRepository;
+import com.servicios.FoodExpress.Model.Comentario;
+import com.servicios.FoodExpress.Repository.ComentarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -116,14 +116,9 @@ public class ComentarioService {
     }
 
     private ComentarioOutput mapToOutput(Comentario comentario){
-        ComentarioOutput out = new ComentarioOutput();
-
-        out.setId(comentario.getId());
-        out.setCliente_id(comentario.getClienteid());
-        out.setProducto_id(comentario.getProductoid());
-        out.setComentario(comentario.getComentario());
-        out.setRating(comentario.getRating());
-        out.setFecha_upload(comentario.getFecha_upload());
+        ComentarioOutput out = ComentarioOutput.builder().id(comentario.getId()).cliente_id(comentario.getClienteid())
+                        .producto_id(comentario.getProductoid()).comentario(comentario.getComentario()).rating(comentario.getRating())
+                        .fecha_upload(comentario.getFecha_upload()).build();
 
         // Llamadas a los microservicios para obtener los nombres del cliente y del producto
         String clienteNombre = GetDatos("c", comentario.getClienteid(), "nombre");

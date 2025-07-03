@@ -1,5 +1,6 @@
 package com.servicios.FoodExpress.DTOs;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -8,7 +9,7 @@ import java.time.LocalDate;
  * Clase que representa la salida de un comentario.
  * Contiene información sobre el cliente, el producto, el comentario y la fecha de subida.
  */
-@Data
+@Data @Builder
 public class ComentarioOutput {
     private Long id;
 

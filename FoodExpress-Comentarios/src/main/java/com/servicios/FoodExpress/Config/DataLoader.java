@@ -1,7 +1,7 @@
 package com.servicios.FoodExpress.Config;
 
-import com.servicios.FoodExpress.model.Comentario;
-import com.servicios.FoodExpress.repository.ComentarioRepository;
+import com.servicios.FoodExpress.Model.Comentario;
+import com.servicios.FoodExpress.Repository.ComentarioRepository;
 import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

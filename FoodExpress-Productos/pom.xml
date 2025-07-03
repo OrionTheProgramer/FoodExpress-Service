@@ -97,18 +97,20 @@
       <version>19.8.0.0</version>
     </dependency>
 
-    <!-- Spring Boot Test (incluye JUnit 5, Mockito, Hamcrest, Reactor Test, etc.) -->
+    <!-- Spring Boot Test (incluye Spring Boot Test, JUnit 5, Mockito, Hamcrest, Reactor Test, etc.) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
-      <!-- excluimos JUnit 4 si no lo vamos a usar -->
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
+      <!-- NO excluyas JUnit 4 ni nada de aquí -->
+    </dependency>
+
+    <!-- (opcional) Si quieres tener explícito JUnit 5 API / Engine: -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
     </dependency>
 
     <!-- Lombok para reducir boilerplate code -->

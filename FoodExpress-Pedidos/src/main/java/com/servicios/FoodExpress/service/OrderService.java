@@ -6,9 +6,9 @@ import com.servicios.FoodExpress.Category.Status;
 import com.servicios.FoodExpress.DTOs.OrdenItemDTO;
 import com.servicios.FoodExpress.DTOs.OrdenRequest;
 import com.servicios.FoodExpress.DTOs.OrdenResponse;
-import com.servicios.FoodExpress.model.Orden;
-import com.servicios.FoodExpress.model.OrdenLine;
-import com.servicios.FoodExpress.repository.OrdenRepository;
+import com.servicios.FoodExpress.Model.Orden;
+import com.servicios.FoodExpress.Model.OrdenLine;
+import com.servicios.FoodExpress.Repository.OrdenRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class OrderService implements OrderServiceInterface{
 
     @Override
     public OrdenResponse ObtenerOrden(Long id){
-        Orden o = repo.findById(id).orElseThrow(() -> new RuntimeException("Orden no encontrada con ID: " + id));
+        Orden o = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Orden no encontrada con ID: " + id));
         return ToDTO(o);
     }
 
@@ -69,11 +69,10 @@ public class OrderService implements OrderServiceInterface{
         Integer total = 0;
 
         var items = o.getLines().stream().map(line -> {
-            var item = new OrdenItemDTO();
-            item.setPlatoId(line.getPlatoId());
-            item.setNombre(GetDatos("k", line.getPlatoId(), "nombre"));
-            item.setPrecio(Integer.parseInt(GetDatos("k", line.getPlatoId(), "precio")));
-            item.setCantidad(line.getCantidad());
+            var item = OrdenItemDTO.builder().platoId(line.getPlatoId())
+                    .nombre(GetDatos("k", line.getPlatoId(), "nombre"))
+                            .precio(Integer.parseInt(GetDatos("k", line.getPlatoId(), "precio")))
+                                    .cantidad(line.getCantidad()).build();
             return item;
         }).toList();
 

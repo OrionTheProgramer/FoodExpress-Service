@@ -1,8 +1,8 @@
 package com.servicios.FoodExpress.service;
 
 import com.servicios.FoodExpress.Category.ProductoCategory;
-import com.servicios.FoodExpress.model.Producto;
-import com.servicios.FoodExpress.repository.ProductoRepository;
+import com.servicios.FoodExpress.Model.Producto;
+import com.servicios.FoodExpress.Repository.ProductoRepository;
 /*import org.springframework.beans.factory.annotation.Autowired; cuando tenga mas de un contructor se debe utilizar*/
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ProductoService {
      * @return Un objeto Producto si se encuentra, o null si no se encuentra.
      */
     public Producto BuscarProductoPorId(Long id) {
-        return repo.findById(id).orElse(null);
+        return repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
     }
 
     /**
@@ -105,16 +105,11 @@ public class ProductoService {
      * @param id El ID del producto a eliminar.
      */
     public void EliminarProducto(Long id) {
-        try {
-            Producto exis = BuscarProductoPorId(id);
-            if (exis != null) {
-                repo.delete(exis);
-            } else {
-                throw new RuntimeException("Producto no encontrado");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al eliminar el producto: " + e.getMessage());
+        Producto producto = repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
+        if (producto != null) {
+            repo.delete(producto);
+        } else {
+            throw new IllegalArgumentException("Producto no encontrado con ID: " + id);
         }
     }
 }

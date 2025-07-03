@@ -14,6 +14,7 @@ public enum ProductoCategory {
     VEGETARIANO,
     VEGANO,
     COMIDA_RAPIDA,
+    OTRO,
     COCTEL;
 
 }
