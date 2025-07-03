@@ -79,7 +79,7 @@ class ClienteTest {
                 .email("ana@mail.com").telefono("1234")
                 .direccion("Av. A").categoria(ClienteCategory.Comprador_VIP)
                 .build();
-        // el service recibe String categoría, tu repo.findByCategoria debe mirar el código tras el guión bajo
+        // el service recibe String categoría
         when(repo.findByCategoria("VIP")).thenReturn(Arrays.asList(c1));
 
         List<Cliente> vip = service.ObtenerPorCategoria("VIP");
@@ -138,7 +138,6 @@ class ClienteTest {
         // 2) Stubear save
         when(repo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        // Ejecutamos
         Cliente actualizado = service.ActualizarDatos(cambios, 7L);
 
         // Verificaciones
@@ -147,7 +146,6 @@ class ClienteTest {
         assertEquals("jc@mail.com", actualizado.getEmail());
         assertEquals(ClienteCategory.Comprador_VIP, actualizado.getCategoria());
 
-        // Capturamos lo que llamó a repo.save()
         ArgumentCaptor<Cliente> captor = ArgumentCaptor.forClass(Cliente.class);
         verify(repo).save(captor.capture());
         Cliente saved = captor.getValue();
